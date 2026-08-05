@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sumbō | POS, Sales & Inventory Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    :root {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f1f5f9;
+      --bg-input: #f8fafc;
+
+      --accent-emerald: #0d9488;
+      --accent-cyan: #0284c7;
+      --accent-indigo: #4338ca;
+      --accent-warning: #d97706;
+      --accent-danger: #e11d48;
+
+      --grad-primary: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);
+
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+
+      --border-color: #e2e8f0;
+      --border-hover: rgba(13, 148, 136, 0.4);
+
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 6px 18px -2px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 16px 36px -4px rgba(15, 23, 42, 0.12);
+
+      --font-heading: 'Outfit', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font-body); background: var(--bg-primary); color: var(--text-primary); overflow-x: hidden; min-height: 100vh; }
+    h1, h2, h3, h4, h5 { font-family: var(--font-heading); letter-spacing: -0.02em; color: var(--text-primary); }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.55rem; padding: 0.65rem 1.25rem; font-weight: 600; font-size: 0.875rem; border-radius: var(--radius-sm); border: 1px solid transparent; cursor: pointer; transition: all 0.2s ease; user-select: none; }
+    .btn-primary { background: var(--grad-primary); color: #fff; box-shadow: 0 2px 8px rgba(13, 148, 136, 0.25); }
+    .btn-primary:hover { transform: translateY(-1px); filter: brightness(1.05); }
+    .btn-secondary { background: #ffffff; color: var(--text-primary); border-color: var(--border-color); }
+    .btn-secondary:hover { background: #f1f5f9; border-color: #cbd5e1; }
+    .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+
+    .input-field { width: 100%; padding: 0.65rem 1rem; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.9rem; }
+    .input-field:focus { outline: none; border-color: var(--accent-emerald); box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1); }
+
+    .badge { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25rem 0.65rem; font-size: 0.72rem; font-weight: 700; border-radius: 99px; text-transform: uppercase; }
+    .badge-success { background: rgba(13, 148, 136, 0.1); color: var(--accent-emerald); border: 1px solid rgba(13, 148, 136, 0.25); }
+    .badge-warning { background: rgba(217, 119, 6, 0.1); color: var(--accent-warning); border: 1px solid rgba(217, 119, 6, 0.25); }
+    .badge-danger { background: rgba(225, 29, 72, 0.1); color: var(--accent-danger); border: 1px solid rgba(225, 29, 72, 0.25); }
+    .badge-blue { background: rgba(2, 132, 199, 0.1); color: var(--accent-cyan); border: 1px solid rgba(2, 132, 199, 0.25); }
+
+    .glass-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); }
+    .card-hover-lift { transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease; }
+    .card-hover-lift:hover { transform: translateY(-2px); border-color: #cbd5e1; box-shadow: var(--shadow-md); }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+    .modal-card { background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); width: 100%; max-width: 500px; padding: 1.75rem; box-shadow: var(--shadow-lg); }
+
+    @media print {
+      body * { visibility: hidden; }
+      .printable-receipt, .printable-receipt * { visibility: visible; }
+      .printable-receipt { position: absolute; left: 0; top: 0; width: 80mm !important; background: #fff !important; color: #000 !important; font-family: monospace !important; padding: 10px; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    const seedProducts = [
+      { id: 'p1', sku: 'EL-001', barcode: '8901001', name: 'Wireless Noise-Canceling Headphones', category: 'electronics', price: 149.99, stock: 18, reorderPoint: 5, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80', unit: 'pcs' },
+      { id: 'p2', sku: 'EL-002', barcode: '8901002', name: 'Mechanical Gaming Keyboard RGB', category: 'electronics', price: 89.99, stock: 4, reorderPoint: 6, image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&q=80', unit: 'pcs' },
+      { id: 'p3', sku: 'AP-001', barcode: '8902001', name: 'Premium Cotton Hooded Sweatshirt', category: 'apparel', price: 54.99, stock: 15, reorderPoint: 5, image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=400&q=80', unit: 'pcs' }
+    ];
+
+    const seedStores = [
+      { id: 's1', name: 'Sumbō Retail & Supermarket', owner: 'Sarah Jenkins', plan: 'Enterprise', status: 'Active' },
+      { id: 's2', name: 'Sumbō Coffee & Bakery', owner: 'David Miller', plan: 'Pro', status: 'Active' },
+      { id: 's3', name: 'Sumbō Fashion Hub', owner: 'Elena Rostova', plan: 'Starter', status: 'Active' }
+    ];
+
+    function App() {
+      const [activeTab, setActiveTab] = useState('pos');
+      const [products, setProducts] = useState(seedProducts);
+      const [stores, setStores] = useState(seedStores);
+      const [cart, setCart] = useState([]);
+      const [transactions, setTransactions] = useState([
+        { id: 'TXN-9041', timestamp: new Date().toISOString(), items: [{ name: 'Wireless Headphones', quantity: 1, price: 149.99 }], total: 162.74, customerName: 'Alex Rivera' }
+      ]);
+      const [searchQuery, setSearchQuery] = useState('');
+      const [receiptModal, setReceiptModal] = useState(null);
+      const [user, setUser] = useState({ name: 'Sarah Jenkins', storeName: 'Sumbō Retail Market', email: 'owner@sumbo.io' });
+      const [isAuthOpen, setIsAuthOpen] = useState(false);
+
+      const addToCart = (prod) => {
+        if (prod.stock <= 0) return alert('Item is Out of Stock!');
+        setCart(prev => {
+          const exist = prev.find(i => i.id === prod.id);
+          if (exist) return prev.map(i => i.id === prod.id ? { ...i, quantity: i.quantity + 1 } : i);
+          return [...prev, { ...prod, quantity: 1 }];
+        });
+      };
+
+      const cartSubtotal = cart.reduce((a, b) => a + b.price * b.quantity, 0);
+      const cartTax = cartSubtotal * 0.085;
+      const cartTotal = cartSubtotal + cartTax;
+
+      const checkout = () => {
+        if (cart.length === 0) return;
+        const txn = {
+          id: `TXN-${Math.floor(1000 + Math.random() * 9000)}`,
+          timestamp: new Date().toISOString(),
+          items: cart,
+          total: cartTotal
+        };
+        setProducts(prev => prev.map(p => {
+          const item = cart.find(c => c.id === p.id);
+          return item ? { ...p, stock: Math.max(0, p.stock - item.quantity) } : p;
+        }));
+        setTransactions([txn, ...transactions]);
+        setReceiptModal(txn);
+        setCart([]);
+      };
+
+      const toggleStoreStatus = (id) => {
+        setStores(prev => prev.map(s => s.id === id ? { ...s, status: s.status === 'Active' ? 'Suspended' : 'Active' } : s));
+      };
+
+      const lowStockCount = products.filter(p => p.stock <= p.reorderPoint).length;
+
+      return (
+        <div style={{ display: 'flex', height: '100vh', width: '100vw', background: 'var(--bg-primary)' }}>
+          {/* Sidebar */}
+          <div style={{ width: '265px', background: '#ffffff', borderRight: '1px solid var(--border-color)', padding: '1.35rem 1.1rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', paddingBottom: '1.25rem', borderBottom: '1px solid var(--border-color)' }}>
+                <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'var(--grad-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>⚡</div>
+                <div>
+                  <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a' }}>Sumbō<span style={{ color: 'var(--accent-emerald)' }}>POS</span></h1>
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Sales & Inventory Platform</span>
+                </div>
+              </div>
+
+              <div className="card-hover-lift" style={{ margin: '1rem 0 0.75rem 0', padding: '0.75rem 0.85rem', borderRadius: 'var(--radius-md)', background: '#f8fafc', border: '1px solid var(--border-color)', cursor: 'pointer' }} onClick={() => setIsAuthOpen(true)}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--accent-emerald)', fontWeight: 700, textTransform: 'uppercase' }}>ACTIVE STORE</div>
+                <div style={{ fontWeight: 700, fontSize: '0.925rem', color: '#0f172a', marginTop: '2px' }}>{user.storeName}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{user.name}</div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginTop: '0.75rem' }}>
+                {[
+                  { id: 'pos', label: '🛒 POS Terminal' },
+                  { id: 'inventory', label: '📦 Inventory', badge: lowStockCount > 0 ? lowStockCount : null },
+                  { id: 'analytics', label: '📊 Sales Analytics' },
+                  { id: 'admin', label: '🛡️ Back Office Admin', badge: stores.length }
+                ].map(item => (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveTab(item.id)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      width: '100%',
+                      padding: '0.8rem 1rem',
+                      borderRadius: 'var(--radius-sm)',
+                      border: '1px solid',
+                      borderColor: activeTab === item.id ? 'var(--accent-emerald)' : 'transparent',
+                      background: activeTab === item.id ? 'rgba(13, 148, 136, 0.1)' : 'transparent',
+                      color: activeTab === item.id ? 'var(--accent-emerald)' : 'var(--text-secondary)',
+                      fontWeight: activeTab === item.id ? 700 : 500,
+                      fontSize: '0.9rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <span>{item.label}</span>
+                    {item.badge && <span className={`badge ${item.id === 'admin' ? 'badge-blue' : 'badge-danger'}`}>{item.badge}</span>}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <button className="btn btn-secondary btn-sm" onClick={() => setIsAuthOpen(true)}>
+              👤 Profile & Account
+            </button>
+          </div>
+
+          {/* Main Workspace */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+            <header style={{ padding: '1.1rem 1.75rem', background: '#ffffff', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#0f172a' }}>
+                  {activeTab === 'pos' ? 'POS Checkout' : activeTab === 'inventory' ? 'Inventory Manager' : activeTab === 'analytics' ? 'Sales Analytics' : 'Back Office Administration'}
+                </h2>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Store Context: <strong style={{ color: 'var(--accent-emerald)' }}>{user.storeName}</strong></span>
+              </div>
+              <span className="badge badge-success" style={{ padding: '0.45rem 0.85rem' }}>System Online</span>
+            </header>
+
+            <div style={{ flex: 1, padding: '1.5rem' }}>
+              {activeTab === 'pos' && (
+                <div style={{ display: 'flex', gap: '1.25rem', height: 'calc(100vh - 120px)' }}>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <input type="text" className="input-field" placeholder="Search catalog..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+                    <div style={{ flex: 1, overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))', gap: '1rem' }}>
+                      {products.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase())).map(p => (
+                        <div key={p.id} className="glass-card card-hover-lift" style={{ padding: '0.85rem', cursor: 'pointer' }} onClick={() => addToCart(p)}>
+                          <img src={p.image} style={{ width: '100%', height: '120px', objectFit: 'cover', borderRadius: '8px', marginBottom: '0.5rem' }} />
+                          <h4 style={{ fontSize: '0.875rem', fontWeight: 600 }}>{p.name}</h4>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
+                            <span style={{ fontWeight: 800, color: 'var(--accent-emerald)' }}>${p.price.toFixed(2)}</span>
+                            <span className={`badge ${p.stock <= p.reorderPoint ? 'badge-warning' : 'badge-success'}`}>{p.stock} left</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="glass-card" style={{ width: '380px', padding: '1.25rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <h3>Current Cart</h3>
+                    <div style={{ flex: 1, overflowY: 'auto', margin: '0.85rem 0', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                      {cart.map(i => (
+                        <div key={i.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.65rem', background: '#f8fafc', borderRadius: '8px' }}>
+                          <div>
+                            <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{i.name}</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--accent-emerald)' }}>${i.price} x {i.quantity}</div>
+                          </div>
+                          <div style={{ fontWeight: 800 }}>${(i.price * i.quantity).toFixed(2)}</div>
+                        </div>
+                      ))}
+                    </div>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.25rem', fontWeight: 800, marginBottom: '1rem' }}>
+                        <span>Total</span>
+                        <span style={{ color: 'var(--accent-emerald)' }}>${cartTotal.toFixed(2)}</span>
+                      </div>
+                      <button className="btn btn-primary" style={{ width: '100%', padding: '0.85rem' }} onClick={checkout} disabled={cart.length === 0}>Checkout</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'admin' && (
+                <div className="glass-card" style={{ padding: '1.5rem' }}>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '1rem' }}>Back Office Store Administration</h3>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.78rem', textTransform: 'uppercase' }}>
+                        <th style={{ padding: '0.75rem 1rem' }}>Store Name</th>
+                        <th style={{ padding: '0.75rem 1rem' }}>Owner</th>
+                        <th style={{ padding: '0.75rem 1rem' }}>Plan</th>
+                        <th style={{ padding: '0.75rem 1rem' }}>Status</th>
+                        <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>Back Office Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {stores.map(s => (
+                        <tr key={s.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                          <td style={{ padding: '0.85rem 1rem', fontWeight: 700 }}>{s.name}</td>
+                          <td style={{ padding: '0.85rem 1rem' }}>{s.owner}</td>
+                          <td style={{ padding: '0.85rem 1rem' }}><span className="badge badge-blue">{s.plan}</span></td>
+                          <td style={{ padding: '0.85rem 1rem' }}><span className={`badge ${s.status === 'Active' ? 'badge-success' : 'badge-danger'}`}>{s.status}</span></td>
+                          <td style={{ padding: '0.85rem 1rem', textAlign: 'right' }}>
+                            <button className={`btn ${s.status === 'Active' ? 'btn-danger' : 'btn-primary'} btn-sm`} onClick={() => toggleStoreStatus(s.id)}>
+                              {s.status === 'Active' ? 'Suspend Store' : 'Activate Store'}
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
