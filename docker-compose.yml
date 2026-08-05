@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # Sumbō Web POS Frontend & Static App
+  sumbo-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sumbo-web-pos
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - sumbo-db
+      - sumbo-redis
+    networks:
+      - sumbo-network
+
+  # PostgreSQL Database Container
+  sumbo-db:
+    image: postgres:16-alpine
+    container_name: sumbo-postgres-db
+    restart: always
+    environment:
+      POSTGRES_DB: sumbo_db
+      POSTGRES_USER: sumbo_user
+      POSTGRES_PASSWORD: sumbo_secure_password_2026
+    ports:
+      - "5432:5432"
+    volumes:
+      - sumbo-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sumbo_user -d sumbo_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sumbo-network
+
+  # Redis In-Memory Cache & Session Store
+  sumbo-redis:
+    image: redis:7-alpine
+    container_name: sumbo-redis-cache
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - sumbo-redis-data:/data
+    networks:
+      - sumbo-network
+
+networks:
+  sumbo-network:
+    driver: bridge
+
+volumes:
+  sumbo-db-data:
+  sumbo-redis-data:
